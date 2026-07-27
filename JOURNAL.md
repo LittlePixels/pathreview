@@ -27,3 +27,17 @@ thresholds can be tuned with data instead of guesswork.
 **Setup confirmation:** [x] App runs locally at localhost:5173
 
 **Cohort ledger:** [ ] Issue added to cohort ledger
+
+## Week 8 — Reproduction & solution planning
+
+**Reproduction commit link:** https://github.com/LittlePixels/pathreview/commit/f047af241a5cb6732cdcf0c8e54216a82b7fc2cb
+
+**Reproduction summary:**
+Since #72 is a missing-capability issue, I reproduced the gap rather than a crash: I ran the existing `BiasDetector` over stored-review text via a throwaway script ([scripts/repro_bias_audit.py](scripts/repro_bias_audit.py)), feeding it benign snippets from the seeded reviews and a few crafted biased phrasings. The benign text was correctly unflagged (0/3 false positives), but all three crafted biased strings went undetected (3/3 false negatives) — and crucially there is no audit script, no FP/FN report, and `detect_bias` is never even called in the pipeline ([review_service.py:366](core/services/review_service.py#L366)), so these blind spots are completely unmeasured today.
+
+**PLAN.md link:** [PLAN.md](PLAN.md)
+
+**Walkthrough video (recommended):** [not recorded]
+
+**Blockers or open questions:**
+The `Profile` model has no demographic fields, so the issue's requested "breakdown by demographic signal" can't come from profile attributes — I plan to derive signals from a labeled fixture set of review text instead. Open question for Week 9: whether the maintainers expect the audit to run against the live DB, a fixture set, or both.
