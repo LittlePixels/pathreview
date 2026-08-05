@@ -99,7 +99,9 @@ fixture-set design decision and the `safety/` vs `scripts/` split, and raised tw
 
 **How you responded:**
 I replied on the PR that I'd fold both into the next push, then did
-([`123fb47`](https://github.com/LittlePixels/pathreview/commit/123fb47)):
+([`123fb47`](https://github.com/LittlePixels/pathreview/commit/123fb47)), and
+[confirmed back on the thread](https://github.com/ascherj/pathreview/pull/583#issuecomment-5198603093)
+once it landed:
 
 - Every rate now prints its own numerator and denominator —
   `false_negative_rate=50.0% (1/2)`, `[education] false_negative_rate=100.0% (4/4)`,
@@ -112,8 +114,10 @@ I replied on the PR that I'd fold both into the next push, then did
 
 I took the suggestion as written rather than negotiating it, because it was correct and it
 was aimed at exactly the thing this deliverable is for. What I did *not* do is expand the
-sample set to make the percentages more trustworthy — that's the real fix and it's too large
-to land as a review response; I've noted it below as the thing I'd do differently.
+sample set to make the percentages more trustworthy — I said so explicitly in the reply,
+since showing the counts mitigates the small-sample problem rather than fixing it. Getting
+to 40–50 labeled samples is the real fix, it's too large to land as a review response, and
+it deserves its own PR; I've noted it below as the thing I'd do differently.
 
 ---
 
