@@ -99,6 +99,16 @@ class TestConfusionMatrix:
         assert matrix.false_positive_rate == pytest.approx(1 / 5)
         assert matrix.false_negative_rate == pytest.approx(2 / 5)
 
+    def test_denominators_match_their_rates(self) -> None:
+        """The exposed denominators are the ones the reported rates divide by."""
+        matrix = ConfusionMatrix(
+            true_positive=3, false_positive=1, true_negative=4, false_negative=2
+        )
+
+        assert matrix.flagged == 4  # precision denominator
+        assert matrix.labeled_biased == 5  # recall and FN-rate denominator
+        assert matrix.labeled_neutral == 5  # FP-rate denominator
+
     def test_rates_are_none_when_undefined(self) -> None:
         """Rates with a zero denominator return None instead of dividing by zero."""
         empty = ConfusionMatrix()
@@ -211,3 +221,26 @@ class TestFormatReportText:
         assert "Overall" in rendered
         assert "[education]" in rendered
         assert "false_negative_rate" in rendered
+
+    def test_rates_are_reported_with_their_counts(self) -> None:
+        """Every rate carries its (numerator/denominator) so small samples are obvious."""
+        samples = [
+            LabeledSample("this is biased", expected_biased=True, signal="origin"),
+            LabeledSample("a missed slight", expected_biased=True, signal="origin"),
+        ]
+
+        rendered = format_report_text(audit_samples(samples, predictor=_predict_by_keyword))
+
+        # 1 of 2 biased samples missed — the percentage alone would imply more data.
+        assert "false_negative_rate=50.0% (1/2)" in rendered
+        assert "recall=50.0% (1/2)" in rendered
+
+    def test_undefined_rates_still_show_counts(self) -> None:
+        """A rate with a zero denominator renders as n/a with its 0/0 counts."""
+        samples = [LabeledSample("neutral text", expected_biased=False, signal="none")]
+
+        rendered = format_report_text(audit_samples(samples, predictor=_predict_by_keyword))
+
+        # Nothing was labeled biased, so the FN rate is undefined rather than 0%.
+        assert "false_negative_rate=n/a (0/0)" in rendered
+        assert "false_positive_rate=0.0% (0/1)" in rendered
